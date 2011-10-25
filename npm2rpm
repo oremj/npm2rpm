@@ -46,11 +46,7 @@ BuildArch: noarch
 
 %install
 rm -rf %{{buildroot}}
-mkdir -p %{{buildroot}}/usr/local/bin
-mkdir %{{buildroot}}/usr/local/lib
-npm --prefix %{{buildroot}} install {name}
-mv %{{buildroot}}/node_modules/.bin/* %{{buildroot}}/usr/local/bin/.
-mv %{{buildroot}}/node_modules %{{buildroot}}/usr/local/lib/.
+npm -g --prefix %{{buildroot}}/%{{_prefix}} install {name}
 
 %clean
 rm -rf %{{buildroot}}
