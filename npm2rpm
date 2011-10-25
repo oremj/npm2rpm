@@ -26,39 +26,39 @@ def npm2rpm(package):
                                               'version'))
 
     spec = """
-    Name:   nodejs-{name}
-    Version:    {version}
-    Release:    1%{{?dist}}
-    Summary:    {description}
+Name:   nodejs-{name}
+Version:    {version}
+Release:    1%{{?dist}}
+Summary:    {description}
 
 
-    Requires: nodejs
-    Group:  Development/Libraries
-    License: {license}
+Requires: nodejs
+Group:  Development/Libraries
+License: {license}
 
-    BuildRoot:  %(mktemp -ud %{{_tmppath}}/%{{name}}-%{{version}}-%{{release}}-XXXXXX)
+BuildRoot:  %(mktemp -ud %{{_tmppath}}/%{{name}}-%{{version}}-%{{release}}-XXXXXX)
 
-    BuildArch: noarch
+BuildArch: noarch
 
-    %description
-    {description}
+%description
+{description}
 
 
-    %install
-    rm -rf %{{buildroot}}
-    mkdir -p %{{buildroot}}/usr/local/bin
-    mkdir %{{buildroot}}/usr/local/lib
-    npm --prefix %{{buildroot}} install {name}
-    mv %{{buildroot}}/node_modules/.bin/* %{{buildroot}}/usr/local/bin/.
-    mv %{{buildroot}}/node_modules %{{buildroot}}/usr/local/lib/.
+%install
+rm -rf %{{buildroot}}
+mkdir -p %{{buildroot}}/usr/local/bin
+mkdir %{{buildroot}}/usr/local/lib
+npm --prefix %{{buildroot}} install {name}
+mv %{{buildroot}}/node_modules/.bin/* %{{buildroot}}/usr/local/bin/.
+mv %{{buildroot}}/node_modules %{{buildroot}}/usr/local/lib/.
 
-    %clean
-    rm -rf %{{buildroot}}
+%clean
+rm -rf %{{buildroot}}
 
-    %files
-    %defattr(-,root,root,-)
-    /*
-    """.format(**pkg_info)
+%files
+%defattr(-,root,root,-)
+/*
+""".format(**pkg_info)
 
     spec_file.write(spec)
     spec_file.flush()
