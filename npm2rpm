@@ -1,0 +1,75 @@
+#!/usr/bin/python2.6
+
+import optparse
+import sys
+
+from subprocess import Popen, PIPE
+from tempfile import NamedTemporaryFile
+
+
+def build_rpm(spec_file):
+    Popen(["/usr/bin/rpmbuild", "-ba", spec_file]).communicate()
+
+
+def npm2rpm(package):
+    spec_file = NamedTemporaryFile(suffix='.spec')
+    def get_npm(key):
+        p = Popen(["/usr/bin/npm", "view", package, key], stdout=PIPE)
+        val = p.communicate()[0].strip()
+        if not val:
+            return "Not specified"
+
+        return val
+    pkg_info = dict((k, get_npm(k)) for k in ('name',
+                                              'description',
+                                              'license',
+                                              'version'))
+
+    spec = """
+    Name:   nodejs-{name}
+    Version:    {version}
+    Release:    1%{{?dist}}
+    Summary:    {description}
+
+
+    Requires: nodejs
+    Group:  Development/Libraries
+    License: {license}
+
+    BuildRoot:  %(mktemp -ud %{{_tmppath}}/%{{name}}-%{{version}}-%{{release}}-XXXXXX)
+
+    BuildArch: noarch
+
+    %description
+    {description}
+
+
+    %install
+    rm -rf %{{buildroot}}
+    mkdir -p %{{buildroot}}/usr/local/bin
+    mkdir %{{buildroot}}/usr/local/lib
+    npm --prefix %{{buildroot}} install {name}
+    mv %{{buildroot}}/node_modules/.bin/* %{{buildroot}}/usr/local/bin/.
+    mv %{{buildroot}}/node_modules %{{buildroot}}/usr/local/lib/.
+
+    %clean
+    rm -rf %{{buildroot}}
+
+    %files
+    %defattr(-,root,root,-)
+    /*
+    """.format(**pkg_info)
+
+    spec_file.write(spec)
+    spec_file.flush()
+    build_rpm(spec_file.name)
+    spec_file.close()
+
+if __name__ == "__main__":
+    parser = optparse.OptionParser(usage="npm2rpm <package>")
+    (options, args) = parser.parse_args()
+    
+    if len(args) != 1:
+        parser.error("Need <package> argument.")
+
+    npm2rpm(args[0])
