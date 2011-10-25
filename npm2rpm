@@ -46,6 +46,7 @@ BuildArch: noarch
 
 %install
 rm -rf %{{buildroot}}
+mkdir -p %{{buildroot}}/%{{_prefix}}
 npm -g --prefix %{{buildroot}}/%{{_prefix}} install {name}
 
 %clean
