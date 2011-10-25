@@ -1,4 +1,4 @@
-Usage: npm2rpm <npm package name>
+Usage: npm2rpm &gt;npm package name&lt;
 
 Requires:
 
