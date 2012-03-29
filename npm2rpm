@@ -1,8 +1,10 @@
 #!/usr/bin/python2.6
 
+import json
 import optparse
 import sys
 
+from os.path import exists, join
 from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
 
@@ -20,10 +22,21 @@ def npm2rpm(package):
             return "Not specified"
 
         return val
-    pkg_info = dict((k, get_npm(k)) for k in ('name',
-                                              'description',
-                                              'license',
-                                              'version'))
+
+    def get_package(key):
+        d = json.load(open(join(package, "package.json")))
+        return d.get(key, "Not specified")
+        
+
+    if exists(join(package, "package.json")):
+        get_info = get_package
+    else:
+        get_info = get_npm
+
+    pkg_info = dict((k, get_info(k)) for k in ('name',
+                                               'description',
+                                               'license',
+                                               'version'))
 
     spec = """
 Name:   nodejs-{name}
