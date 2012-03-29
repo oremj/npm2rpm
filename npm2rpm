@@ -4,7 +4,7 @@ import json
 import optparse
 import sys
 
-from os.path import exists, join
+from os.path import abspath, exists, join
 from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
 
@@ -30,13 +30,16 @@ def npm2rpm(package):
 
     if exists(join(package, "package.json")):
         get_info = get_package
+        location = abspath(package)
     else:
+        location = package
         get_info = get_npm
 
     pkg_info = dict((k, get_info(k)) for k in ('name',
                                                'description',
                                                'license',
                                                'version'))
+    pkg_info['location'] = location
 
     spec = """
 Name:   nodejs-{name}
@@ -60,7 +63,7 @@ BuildArch: noarch
 %install
 rm -rf %{{buildroot}}
 mkdir -p %{{buildroot}}/%{{_prefix}}
-npm -g --prefix %{{buildroot}}/%{{_prefix}} install {name}
+npm -g --prefix %{{buildroot}}/%{{_prefix}} install {location}
 
 %clean
 rm -rf %{{buildroot}}
