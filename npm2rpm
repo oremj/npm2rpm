@@ -2,11 +2,15 @@
 
 import json
 import optparse
+import os
 import sys
 
 from os.path import abspath, exists, join
 from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
+
+
+os.environ['QA_SKIP_BUILD_ROOT'] = '1'
 
 
 def build_rpm(spec_file):
@@ -53,8 +57,6 @@ Group:  Development/Libraries
 License: {license}
 
 BuildRoot:  %(mktemp -ud %{{_tmppath}}/%{{name}}-%{{version}}-%{{release}}-XXXXXX)
-
-BuildArch: noarch
 
 %description
 {description}
