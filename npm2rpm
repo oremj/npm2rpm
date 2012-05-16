@@ -45,6 +45,13 @@ def npm2rpm(package):
                                                'version'))
     pkg_info['location'] = location
 
+    try:
+        pkg_info['license'] = pkg_info['license']['type']
+    except TypeError:
+        pass
+    except KeyError:
+        pkg_info['license'] = ""
+
     spec = """
 Name:   nodejs-{name}
 Version:    {version}
