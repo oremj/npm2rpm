@@ -42,8 +42,12 @@ def npm2rpm(package):
     pkg_info = dict((k, get_info(k)) for k in ('name',
                                                'description',
                                                'license',
+                                               'license.type',
                                                'version'))
     pkg_info['location'] = location
+
+    if pkg_info['license.type']:
+        pkg_info['license'] = pkg_info['license.type']
 
     try:
         pkg_info['license'] = pkg_info['license']['type']
